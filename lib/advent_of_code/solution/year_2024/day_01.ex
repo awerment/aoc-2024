@@ -1,6 +1,7 @@
 defmodule AdventOfCode.Solution.Year2024.Day01 do
   use AdventOfCode.Solution.SharedParse
 
+  @spec part1({list(integer()), list(integer())}) :: integer()
   def part1({left, right} = _input) do
     [Enum.sort(left), Enum.sort(right)]
     |> Stream.zip()
@@ -8,6 +9,7 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
     |> Enum.sum()
   end
 
+  @spec part2({list(integer()), list(integer())}) :: integer()
   def part2({left, right} = _input) do
     frequencies = Enum.frequencies(right)
 
@@ -17,6 +19,7 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
   end
 
   @impl AdventOfCode.Solution.SharedParse
+  @spec parse(String.t()) :: {list(integer()), list(integer())}
   def parse(raw_input) do
     String.split(raw_input, "\n", trim: true)
     |> Stream.map(&Regex.split(~r/\s/, &1, trim: true))
