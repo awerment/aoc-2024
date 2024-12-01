@@ -18,6 +18,6 @@ defmodule AdventOfCode.Solution.Year2024.Day01Test do
   test "part2", %{input: input} do
     result = part2(input)
 
-    assert result
+    assert result == 27_732_508
   end
 end
