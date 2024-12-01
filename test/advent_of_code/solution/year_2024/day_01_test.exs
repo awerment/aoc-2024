@@ -5,19 +5,16 @@ defmodule AdventOfCode.Solution.Year2024.Day01Test do
 
   setup do
     [
-      input: """
-      """
+      input: AdventOfCode.Input.get!(1, 2024)
     ]
   end
 
-  @tag :skip
   test "part1", %{input: input} do
     result = part1(input)
 
-    assert result
+    assert result == 765_748
   end
 
-  @tag :skip
   test "part2", %{input: input} do
     result = part2(input)
 
