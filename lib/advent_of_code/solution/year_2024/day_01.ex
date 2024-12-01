@@ -3,9 +3,8 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
 
   @spec part1({list(integer()), list(integer())}) :: integer()
   def part1({left, right} = _input) do
-    [Enum.sort(left), Enum.sort(right)]
-    |> Stream.zip()
-    |> Stream.map(fn {left, right} -> abs(left - right) end)
+    Enum.zip(Enum.sort(left), Enum.sort(right))
+    |> Enum.map(fn {left, right} -> abs(left - right) end)
     |> Enum.sum()
   end
 
@@ -21,11 +20,11 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
   @impl AdventOfCode.Solution.SharedParse
   @spec parse(String.t()) :: {list(integer()), list(integer())}
   def parse(raw_input) do
-    String.split(raw_input, "\n", trim: true)
-    |> Stream.map(&Regex.split(~r/\s/, &1, trim: true))
-    |> Stream.map(fn [left, right] ->
-      {String.to_integer(left), String.to_integer(right)}
-    end)
+    raw_input
+    |> String.split()
+    |> Stream.map(&String.to_integer/1)
+    |> Stream.chunk_every(2)
+    |> Stream.map(fn [left, right] -> {left, right} end)
     |> Enum.unzip()
   end
 end
