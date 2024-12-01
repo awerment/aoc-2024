@@ -5,7 +5,7 @@ defmodule AdventOfCode.Solution.Year2024.Day01Test do
 
   setup do
     [
-      input: AdventOfCode.Input.get!(1, 2024)
+      input: AdventOfCode.Input.get!(1, 2024) |> parse()
     ]
   end
 
