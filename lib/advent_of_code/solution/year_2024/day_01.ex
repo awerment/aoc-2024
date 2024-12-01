@@ -24,8 +24,6 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
     |> Stream.map(fn [left, right] ->
       {String.to_integer(left), String.to_integer(right)}
     end)
-    |> Enum.reduce({[], []}, fn {left, right}, {left_list, right_list} ->
-      {[left | left_list], [right | right_list]}
-    end)
+    |> Enum.unzip()
   end
 end
