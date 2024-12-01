@@ -30,3 +30,5 @@ advent_of_code-*.tar
 
 # Detritus left behind by macOS Finder
 .DS_Store
+
+.env
