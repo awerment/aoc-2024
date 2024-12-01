@@ -20,8 +20,8 @@ defmodule AdventOfCode.Solution.Year2024.Day01 do
 
   defp to_integer_lists(input) do
     String.split(input, "\n", trim: true)
-    |> Stream.map(&Regex.split(~r/\s/, &1))
-    |> Stream.map(fn [left, _, _, right] ->
+    |> Stream.map(&Regex.split(~r/\s/, &1, trim: true))
+    |> Stream.map(fn [left, right] ->
       {String.to_integer(left), String.to_integer(right)}
     end)
     |> Enum.reduce({[], []}, fn {left, right}, {left_list, right_list} ->
