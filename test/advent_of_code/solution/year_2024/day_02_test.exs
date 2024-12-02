@@ -5,7 +5,7 @@ defmodule AdventOfCode.Solution.Year2024.Day02Test do
 
   setup do
     [
-      input: AdventOfCode.Input.get!(2, 2024)
+      input: AdventOfCode.Input.get!(2, 2024) |> parse()
     ]
   end
 
@@ -18,6 +18,6 @@ defmodule AdventOfCode.Solution.Year2024.Day02Test do
   test "part2", %{input: input} do
     result = part2(input)
 
-    assert result
+    assert result == 493
   end
 end
