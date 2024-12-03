@@ -12,12 +12,14 @@ defmodule AdventOfCode.Solution.Year2024.Day02 do
   def part2(input) do
     input
     |> Enum.filter(fn levels ->
-      levels
-      |> List.duplicate(Enum.count(levels))
-      |> Enum.with_index()
-      |> Enum.map(fn {levels, index} -> List.delete_at(levels, index) end)
-      |> then(fn list_of_levels -> [levels | list_of_levels] end)
-      |> Enum.any?(&levels_safe?/1)
+      count = Enum.count(levels)
+
+      0..count
+      |> Enum.reduce_while(false, fn
+        ^count, false -> {:cont, levels_safe?(levels)}
+        index, false -> {:cont, levels_safe?(List.delete_at(levels, index))}
+        _, true -> {:halt, true}
+      end)
     end)
     |> Enum.count()
   end
