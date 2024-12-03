@@ -12,7 +12,7 @@ defmodule AdventOfCode.Solution.Year2024.Day03 do
       ["do" | _], {_switch, acc} -> {:do, acc}
       ["don't" | _], {_switch, acc} -> {:dont, acc}
       [_, l, r], {:do, acc} -> {:do, acc + String.to_integer(l) * String.to_integer(r)}
-      _, {op, acc} -> {op, acc}
+      _, {switch, acc} -> {switch, acc}
     end)
     |> elem(1)
   end
