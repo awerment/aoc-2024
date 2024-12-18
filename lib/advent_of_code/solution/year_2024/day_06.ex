@@ -3,7 +3,7 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
   import Bitwise
 
   defstruct guard: nil,
-            obstacles: MapSet.new(),
+            obstacles: nil,
             x: 0,
             y: 0
 
@@ -16,9 +16,9 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
       |> Stream.with_index()
       |> Stream.map(fn {c, y} -> {x, y, c} end)
     end)
-    |> Enum.reduce(%__MODULE__{}, fn {x, y, c}, acc ->
+    |> Enum.reduce(%__MODULE__{obstacles: []}, fn {x, y, c}, acc ->
       case c do
-        "#" -> Map.update!(acc, :obstacles, &MapSet.put(&1, {x, y}))
+        "#" -> Map.update!(acc, :obstacles, &[{x, y} | &1])
         "^" -> Map.put(acc, :guard, {{x, y}, {-1, 0}})
         _ -> acc
       end
@@ -28,6 +28,7 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
     # final x and y needed are the ones that are out of bounds
     |> Map.update!(:x, &(&1 + 1))
     |> Map.update!(:y, &(&1 + 1))
+    |> Map.update!(:obstacles, &MapSet.new/1)
   end
 
   def part1(state) do
