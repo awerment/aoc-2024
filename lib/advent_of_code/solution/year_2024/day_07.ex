@@ -12,32 +12,19 @@ defmodule AdventOfCode.Solution.Year2024.Day07 do
     end)
   end
 
-  def part1(input) do
-    solve(input, [&+/2, &*/2])
-  end
-
-  def part2(input) do
-    solve(input, [&+/2, &*/2, &concat/2])
-  end
+  def part1(input), do: solve(input, [&+/2, &*/2])
+  def part2(input), do: solve(input, [&+/2, &*/2, &concat/2])
 
   defp solve(input, ops) do
-    input
-    |> Enum.filter(fn [expected | [first_number | rest]] ->
-      solveable?(expected, first_number, rest, ops)
-    end)
-    |> Enum.map(fn [expected | _] -> expected end)
-    |> Enum.sum()
+    Task.async_stream(input, fn [exp | [n | rest]] -> {exp, check(exp, n, rest, ops)} end)
+    |> Stream.filter(fn {:ok, {_exp, solveable?}} -> solveable? end)
+    |> Enum.reduce(0, fn {:ok, {exp, _}}, acc -> acc + exp end)
   end
 
-  defp solveable?(expected, acc, [_next | _rest], _ops) when expected < acc, do: false
-  defp solveable?(expected, expected, [], _ops), do: true
-  defp solveable?(_expected, _result, [], _ops), do: false
+  defp check(exp, acc, [_n | _rest], _ops) when exp < acc, do: false
+  defp check(exp, exp, [], _ops), do: true
+  defp check(_exp, _result, [], _ops), do: false
+  defp check(exp, acc, [n | rest], ops), do: Enum.any?(ops, &check(exp, &1.(acc, n), rest, ops))
 
-  defp solveable?(expected, acc, [next | rest], ops) do
-    Enum.any?(ops, fn op -> solveable?(expected, op.(acc, next), rest, ops) end)
-  end
-
-  defp concat(x, y) do
-    String.to_integer("#{x}#{y}")
-  end
+  defp concat(x, y), do: Integer.undigits(Integer.digits(x) ++ Integer.digits(y))
 end
