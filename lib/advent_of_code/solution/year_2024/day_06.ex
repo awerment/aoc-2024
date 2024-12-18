@@ -14,9 +14,9 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
     |> Stream.flat_map(fn {line, x} ->
       String.splitter(line, "", trim: true)
       |> Stream.with_index()
-      |> Stream.map(fn {c, y} -> {{x, y}, c} end)
+      |> Stream.map(fn {c, y} -> {x, y, c} end)
     end)
-    |> Enum.reduce(%__MODULE__{}, fn {{x, y}, c}, acc ->
+    |> Enum.reduce(%__MODULE__{}, fn {x, y, c}, acc ->
       case c do
         "#" -> Map.update!(acc, :obstacles, &MapSet.put(&1, {x, y}))
         "^" -> Map.put(acc, :guard, {{x, y}, {-1, 0}})
@@ -25,6 +25,7 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
       |> Map.update!(:x, &max(&1, x))
       |> Map.update!(:y, &max(&1, y))
     end)
+    # final x and y needed are the ones that are out of bounds
     |> Map.update!(:x, &(&1 + 1))
     |> Map.update!(:y, &(&1 + 1))
   end
@@ -39,9 +40,15 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
   def part2(state) do
     %{guard: {guard_xy, _dir}, x: x, y: y} = state
 
-    for x <- 0..(x - 1), y <- 0..(y - 1) do
-      {x, y}
-    end
+    # generate a list of coordinates for the whole grid,
+    # subtract existint obstacles and the starting location of the guard
+    # then, for each of the remaining coordinates:
+    # - place an obstacle
+    # - walk the guard (emitting x, y, and guard's direction)
+    # - an occurance of the same coordinate with the same location means there's a loop
+
+    # subtract 1 here again to account for the out of bounds shift in parse
+    full_grid(x - 1, y - 1)
     |> MapSet.new()
     |> MapSet.difference(state.obstacles)
     |> MapSet.delete(guard_xy)
@@ -62,19 +69,22 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
     |> Enum.count()
   end
 
-  defp part1_emitter(%{guard: {{x, y}, _dir}}), do: x <<< 8 ||| y
-
-  # correct
-  # defp part2_emitter(%{guard: {{x, y}, {dx, dy}}}),
-  #  do: (x + 1) <<< 24 ||| (y + 1) <<< 16 ||| (dx + 1) <<< 8 ||| dy + 1
+  defp part1_emitter(%{guard: {{x, y}, _dir}}) do
+    # to speed up uniqueness checks, turn x and y into a 16 bit value
+    x <<< 8 ||| y
+  end
 
   defp part2_emitter(%{guard: {{x, y}, dir}}) do
-    bor(bor(dir(dir) <<< 16, x <<< 8), y)
+    # to speed up uniqueness checks, turn x, y and direction into an 18 bit value
+    dir(dir) <<< 16 ||| x <<< 8 ||| y
   end
+
+  defp full_grid(x, y), do: for(x <- 0..x, y <- 0..y, do: {x, y})
 
   defp walk(state, emit_fn) do
     state
     |> Stream.unfold(fn
+      # stop walking when guard steps out of bounds (0..(x - 1))
       %{guard: {{-1, _y}, _}} -> nil
       %{guard: {{_x, -1}, _}} -> nil
       %{guard: {{x, _y}, _}, x: x} -> nil
@@ -84,18 +94,26 @@ defmodule AdventOfCode.Solution.Year2024.Day06 do
   end
 
   defp step(%{guard: {{x, y}, {dx, dy}}} = state, emit_fn) do
-    if MapSet.member?(state.obstacles, {x + dx, y + dy}) do
+    ahead = {x + dx, y + dy}
+    # look ahead for obstacles in walking direction
+    if MapSet.member?(state.obstacles, ahead) do
+      # if there is an obstacle, remain in place and turn
+      # note: yes, this means when turning, the same coordinates are emitted twice
+      # couldn't be bothered to optimise this fact away, MapSet will take care of it
       {emit_fn.(state), %{state | guard: {{x, y}, turn({dx, dy})}}}
     else
-      {emit_fn.(state), %{state | guard: {{x + dx, y + dy}, {dx, dy}}}}
+      # if there is no obstacle, step ahead and keep direction
+      {emit_fn.(state), %{state | guard: {ahead, {dx, dy}}}}
     end
   end
 
+  # x = 0, y = 0 is the top-left corner
   defp turn({0, +1}), do: {+1, 0}
   defp turn({+1, 0}), do: {0, -1}
   defp turn({0, -1}), do: {-1, 0}
   defp turn({-1, 0}), do: {0, +1}
 
+  # for part 2: reduce direction to 2-bit value
   defp dir({-1, 0}), do: 0
   defp dir({0, +1}), do: 1
   defp dir({+1, 0}), do: 2
