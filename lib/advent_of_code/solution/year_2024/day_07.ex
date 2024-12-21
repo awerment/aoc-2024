@@ -16,8 +16,8 @@ defmodule AdventOfCode.Solution.Year2024.Day07 do
 
   # Part 1 and 2 differ only in the operators that are applied left-to-right,
   # so the `solve/2` function takes a list of the operators' function references
-  def part1(input), do: solve(input, [&+/2, &*/2])
-  def part2(input), do: solve(input, [&+/2, &*/2, &concat/2])
+  def part1(input), do: solve(input, [&*/2, &+/2])
+  def part2(input), do: solve(input, [&*/2, &concat/2, &+/2])
 
   defp solve(input, ops) do
     # `Task.async_stream/2` has a negative impact on part 1's runtime,
@@ -48,7 +48,9 @@ defmodule AdventOfCode.Solution.Year2024.Day07 do
   # Enum.any?/2 does exit early, so not worried too much about the non-concurrent nature of it
   defp check(exp, acc, [n | rest], ops), do: Enum.any?(ops, &check(exp, &1.(acc, n), rest, ops))
 
-  # Split x and y into lists of digits, concat the lists and make that an int again
-  # There's probably a better way to do this...
-  defp concat(x, y), do: Integer.undigits(Integer.digits(x) ++ Integer.digits(y))
+  defp concat(x, y), do: x * fac(y) + y
+
+  defp fac(n) when n < 10, do: 10
+  defp fac(n) when n < 100, do: 100
+  defp fac(_n), do: 1000
 end
