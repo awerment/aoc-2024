@@ -4,23 +4,18 @@ defmodule AdventOfCode.Solution.Year2024.Day09Test do
   import AdventOfCode.Solution.Year2024.Day09
 
   setup do
-    [
-      input: """
-      """
-    ]
+    [input: AdventOfCode.Input.get!(9, 2024)]
   end
 
-  @tag :skip
   test "part1", %{input: input} do
     result = part1(input)
 
-    assert result
+    assert result == 6_279_058_075_753
   end
 
-  @tag :skip
   test "part2", %{input: input} do
     result = part2(input)
 
-    assert result
+    assert result == 6_301_361_958_738
   end
 end
